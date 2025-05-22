@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Student Marks Checker</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: white;
+    }
+
+    .container {
+      background-color: #22254b;
+      border-radius: 12px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+      max-width: 480px;
+      width: 100%;
+      padding: 30px 40px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      font-size: 2rem;
+      letter-spacing: 1px;
+      text-shadow: 0 0 10px rgba(255 255 255 / 0.3);
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 10px 14px;
+      margin-top: 6px;
+      border-radius: 6px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+      transition: box-shadow 0.3s ease;
+    }
+
+    input[type="text"]:focus, input[type="number"]:focus {
+      box-shadow: 0 0 8px #764ba2;
+    }
+
+    button {
+      margin-top: 1.8rem;
+      width: 100%;
+      background: #764ba2;
+      border: none;
+      padding: 14px;
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      box-shadow: 0 5px 15px rgba(118, 75, 162, 0.6);
+    }
+
+    button:hover {
+      background: #667eea;
+      box-shadow: 0 7px 20px rgba(102, 126, 234, 0.8);
+    }
+
+    #result {
+      margin-top: 2rem;
+      background: #413d6f;
+      border-radius: 10px;
+      padding: 18px 24px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.6);
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: #d8d8f2;
+      min-height: 50px;
+      text-align: center;
+      word-wrap: break-word;
+    }
+
+    .error {
+      color: #ff6b6b;
+      font-weight: 700;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main" aria-label="Student Marks Checker">
+    <h1>Student Marks Checker</h1>
+
+    <label for="studentName">Student Name:</label>
+    <input type="text" id="studentName" placeholder="Enter student's name" aria-required="true" />
+
+    <label for="s1">Subject 1 Marks:</label>
+    <input type="number" id="s1" placeholder="0 - 100" min="0" max="100" required aria-required="true" />
+
+    <label for="s2">Subject 2 Marks:</label>
+    <input type="number" id="s2" placeholder="0 - 100" min="0" max="100" required aria-required="true" />
+
+    <label for="s3">Subject 3 Marks:</label>
+    <input type="number" id="s3" placeholder="0 - 100" min="0" max="100" required aria-required="true" />
+
+    <label for="s4">Subject 4 Marks:</label>
+    <input type="number" id="s4" placeholder="0 - 100" min="0" max="100" required aria-required="true" />
+
+    <label for="s5">Subject 5 Marks:</label>
+    <input type="number" id="s5" placeholder="0 - 100" min="0" max="100" required aria-required="true" />
+
+    <button type="button" id="calculateBtn">Calculate Average</button>
+
+    <div id="result" role="alert" aria-live="polite"></div>
+  </div>
+
+  <script>
+    function calculateAverage() {
+      const name = document.getElementById('studentName').value.trim();
+      if (!name) {
+        displayResult('Please enter the student\'s name.', true);
+        return;
+      }
+
+      const marks = [];
+      for(let i=1; i<=5; i++){
+        let val = document.getElementById('s' + i).value;
+        if(val === '') {
+          displayResult(`Please enter marks for Subject ${i}.`, true);
+          return;
+        }
+        let num = Number(val);
+        if(isNaN(num) || num < 0 || num > 100) {
+          displayResult(`Marks for Subject ${i} must be a number between 0 and 100.`, true);
+          return;
+        }
+        marks.push(num);
+      }
+
+      const total = marks.reduce((acc, val) => acc + val, 0);
+      const average = total / marks.length;
+
+      displayResult(`${name}'s Average Marks: ${average.toFixed(2)}`, false);
+    }
+
+    function displayResult(message, isError) {
+      const resultDiv = document.getElementById('result');
+      resultDiv.textContent = message;
+      resultDiv.className = isError ? 'error' : '';
+    }
+
+    document.getElementById('calculateBtn').addEventListener('click', calculateAverage);
+  </script>
+</body>
+</html>
+
