@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Virtual Focus Timer (Pomodoro App)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+  }
+  h1 {
+    margin-bottom: 1rem;
+    font-weight: 700;
+    font-size: 2.5rem;
+    text-align: center;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+  .timer {
+    background: rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 3rem 4rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    text-align: center;
+    width: 320px;
+  }
+  .time-display {
+    font-size: 6rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    user-select: none;
+  }
+  .mode {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    color: #fbd38d;
+    font-weight: 600;
+    user-select: none;
+  }
+  button {
+    background: #f6ad55;
+    border: none;
+    padding: 0.8rem 2.5rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #5a4120;
+    transition: background-color 0.3s ease;
+    margin: 0 0.5rem;
+    user-select: none;
+  }
+  button:hover:not(:disabled) {
+    background: #dd6b20;
+  }
+  button:disabled {
+    background: #a16d38;
+    cursor: not-allowed;
+  }
+  .controls {
+    user-select: none;
+  }
+  .settings {
+    margin-top: 2rem;
+    background: rgba(255,255,255,0.12);
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 0.9rem;
+  }
+  .setting-group {
+    margin-bottom: 1rem;
+  }
+  .setting-group label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+  }
+  .setting-group input {
+    width: 60px;
+    padding: 0.3rem 0.4rem;
+    border-radius: 6px;
+    border: none;
+    font-size: 1rem;
+    text-align: center;
+  }
+  @media (max-width: 400px) {
+    .timer {
+      width: 90vw;
+      padding: 2rem 2rem;
+    }
+    .time-display {
+      font-size: 4.5rem;
+    }
+  }
+</style>
+</head>
+<body>
+<h1>Virtual Focus Timer</h1>
+<div class="timer" role="region" aria-live="polite" aria-atomic="true" aria-label="Pomodoro Timer">
+  <div class="mode" id="modeDisplay">Focus Time</div>
+  <div class="time-display" id="timeDisplay">25:00</div>
+  <div class="controls">
+    <button id="startBtn" aria-label="Start Timer">Start</button>
+    <button id="pauseBtn" aria-label="Pause Timer" disabled>Pause</button>
+    <button id="resetBtn" aria-label="Reset Timer">Reset</button>
+  </div>
+  <div class="settings" aria-label="Timer Settings">
+    <div class="setting-group">
+      <label for="focusMinutes">Focus Duration (minutes)</label>
+      <input type="number" id="focusMinutes" min="1" max="90" value="25" />
+    </div>
+    <div class="setting-group">
+      <label for="breakMinutes">Break Duration (minutes)</label>
+      <input type="number" id="breakMinutes" min="1" max="30" value="5" />
+    </div>
+    <div class="setting-group">
+      <label for="cycles">Cycles (Focus + Break)</label>
+      <input type="number" id="cycles" min="1" max="10" value="4" />
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const modeDisplay = document.getElementById('modeDisplay');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const focusInput = document.getElementById('focusMinutes');
+    const breakInput = document.getElementById('breakMinutes');
+    const cyclesInput = document.getElementById('cycles');
+
+    // State variables
+    let focusDuration = parseInt(focusInput.value, 10) * 60; // in seconds
+    let breakDuration = parseInt(breakInput.value, 10) * 60; // in seconds
+    let totalCycles = parseInt(cyclesInput.value, 10);
+    let currentCycle = 0;
+    let isFocus = true;
+    let timer = null;
+    let timeLeft = focusDuration;
+    let isRunning = false;
+
+    // Format seconds as MM:SS
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+      const s = (seconds % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    // Update display
+    function updateDisplay() {
+      timeDisplay.textContent = formatTime(timeLeft);
+      modeDisplay.textContent = isFocus ? `Focus Time (Cycle ${currentCycle + 1} of ${totalCycles})` : 'Break Time';
+    }
+
+    // Timer tick
+    function tick() {
+      if(timeLeft > 0) {
+        timeLeft--;
+        updateDisplay();
+      } else {
+        if(isFocus) {
+          // Switch to break
+          isFocus = false;
+          timeLeft = breakDuration;
+          updateDisplay();
+        } else {
+          // Completed one cycle (focus+break)
+          currentCycle++;
+          if(currentCycle >= totalCycles) {
+            stopTimer();
+            alert('🎉 Congrats! All cycles completed.');
+            return;
+          }
+          // Switch to focus
+          isFocus = true;
+          timeLeft = focusDuration;
+          updateDisplay();
+        }
+      }
+    }
+
+    function startTimer() {
+      if(isRunning) return;
+      // Update durations and cycles from inputs
+      const f = parseInt(focusInput.value, 10);
+      const b = parseInt(breakInput.value, 10);
+      const c = parseInt(cyclesInput.value, 10);
+      if(isNaN(f) || f < 1 || f > 90 || isNaN(b) || b < 1 || b > 30 || isNaN(c) || c < 1 || c > 10) {
+        alert('Please enter valid durations and cycles:\n- Focus: 1-90 minutes\n- Break: 1-30 minutes\n- Cycles: 1-10');
+        return;
+      }
+      focusDuration = f * 60;
+      breakDuration = b * 60;
+      totalCycles = c;
+
+      // If timer never started or was reset
+      if(!isRunning && timeLeft === 0) {
+        timeLeft = focusDuration;
+        isFocus = true;
+        currentCycle = 0;
+      }
+      isRunning = true;
+      startBtn.disabled = true;
+      pauseBtn.disabled = false;
+      focusInput.disabled = true;
+      breakInput.disabled = true;
+      cyclesInput.disabled = true;
+
+      if(!timer) {
+        timer = setInterval(tick, 1000);
+      }
+      updateDisplay();
+    }
+
+    function pauseTimer() {
+      if(!isRunning) return;
+      isRunning = false;
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+      clearInterval(timer);
+      timer = null;
+    }
+
+    function resetTimer() {
+      isRunning = false;
+      clearInterval(timer);
+      timer = null;
+      currentCycle = 0;
+      isFocus = true;
+      timeLeft = focusDuration;
+      updateDisplay();
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+      focusInput.disabled = false;
+      breakInput.disabled = false;
+      cyclesInput.disabled = false;
+    }
+
+    // Initial display
+    resetTimer();
+
+    startBtn.addEventListener('click', startTimer);
+    pauseBtn.addEventListener('click', pauseTimer);
+    resetBtn.addEventListener('click', resetTimer);
+
+  })();
+</script>
+</body>
+</html>
+

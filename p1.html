@@ -1,0 +1,174 @@
+
+
+&lt;!DOCTYPE html>
+
+&lt;html lang="en">
+&lt;head>
+&lt;meta charset="UTF-8">
+&lt;meta name="viewport" content="width=device-width, initial-scale=1.0">
+&lt;title>Simulated PAN Card Info&lt;/title>
+&lt;style>
+body {
+font-family: 'Poppins', sans-serif;
+background: #f0f0f0;
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 100vh;
+margin: 0;
+}
+.container {
+background: #fff;
+border-radius: 10px;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+padding: 30px;
+width: 400px;
+text-align: center;
+}
+h1 {
+color: #333;
+margin-bottom: 20px;
+}
+.form-group {
+margin-bottom: 15px;
+text-align: left;
+}
+label {
+display: block;
+font-weight: bold;
+margin-bottom: 5px;
+color: #555;
+}
+input {
+width: calc(100% - 20px);
+padding: 10px;
+border: 1px solid #ccc;
+border-radius: 5px;
+font-size: 16px;
+box-sizing: border-box;
+}
+button {
+background-color: #007bff;
+color: white;
+padding: 12px 20px;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+font-size: 16px;
+transition: background-color 0.3s ease;
+margin-top: 20px;
+}
+button:hover {
+background-color: #0056b3;
+}
+.pan-card {
+background: linear-gradient(135deg, #e0f2f7, #b3e5fc);
+border: 1px solid #81d4fa;
+border-radius: 8px;
+padding: 20px;
+margin-top: 30px;
+text-align: left;
+position: relative;
+box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.gov-india {
+font-size: 14px;
+color: #0d47a1;
+position: absolute;
+top: 10px;
+right: 10px;
+}
+.income-tax {
+font-size: 16px;
+font-weight: bold;
+color: #1565c0;
+margin-bottom: 10px;
+}
+.name-label, .pan-label {
+font-size: 12px;
+color: #333;
+margin-bottom: 2px;
+}
+.name-value {
+font-size: 16px;
+font-weight: bold;
+color: #212121;
+margin-bottom: 10px;
+}
+.pan-value {
+font-size: 20px;
+font-weight: bold;
+color: #d84315;
+}
+.watermark {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%) rotate(-15deg);
+font-size: 60px;
+color: rgba(0, 0, 0, 0.05);
+font-weight: bold;
+user-select: none;
+}
+.logo-placeholder {
+position: absolute;
+top: 10px;
+left: 10px;
+width: 50px;
+height: 50px;
+border: 1px dashed #ccc;
+border-radius: 5px;
+display: flex;
+justify-content: center;
+align-items: center;
+font-size: 12px;
+color: #777;
+}
+&lt;/style>
+&lt;script>
+function generatePanInfo() {
+var v1 = document.getElementById("candidateName").value;
+var v2 = document.getElementById("fatherName").value;
+var v3 = document.getElementById("motherName").value;
+var v4 = document.getElementById("aadharNumber").value;
+var v5 = v1.slice(0, 4).toUpperCase() + v2.charAt(v2.length - 1).toUpperCase() + v3.charAt(v3.length - 1).toUpperCase();
+v5 += v4.slice(8, 12).toUpperCase();
+document.getElementById("generatedPan").innerText = v5;
+document.getElementById("displayName").innerText = document.getElementById("candidateName").value.toUpperCase();
+}
+&lt;/script>
+&lt;/head>
+&lt;body>
+&lt;div class="container">
+&lt;h1>Enter Your Details&lt;/h1>
+&lt;div class="form-group">
+&lt;label for="candidateName">Candidate Name:&lt;/label>
+&lt;input type="text" id="candidateName" placeholder="Enter candidate name" />
+&lt;/div>
+&lt;div class="form-group">
+&lt;label for="fatherName">Father's Name:&lt;/label>
+&lt;input type="text" id="fatherName" placeholder="Enter father's name" />
+&lt;/div>
+&lt;div class="form-group">
+&lt;label for="motherName">Mother's Name:&lt;/label>
+&lt;input type="text" id="motherName" placeholder="Enter mother's name" />
+&lt;/div>
+&lt;div class="form-group">
+&lt;label for="aadharNumber">Aadhar Card Number:&lt;/label>
+&lt;input type="text" id="aadharNumber" placeholder="Enter Aadhar card number" maxlength="12" />
+&lt;/div>
+&lt;button onclick="generatePanInfo()">Generate Simulated PAN Info&lt;/button>
+
+    <div class="pan-card">
+        <div class="logo-placeholder">Logo</div>
+        <div class="gov-india">भारत सरकार<br>GOVT. OF INDIA</div>
+        <div class="income-tax">आयकर विभाग<br>INCOME TAX DEPARTMENT</div>
+        <div class="name-label">Name</div>
+        <div class="name-value" id="displayName"></div>
+        <div class="pan-label">Permanent Account Number</div>
+        <div class="pan-value" id="generatedPan"></div>
+        <div class="watermark">SAMPLE</div>
+    </div>
+</div>
+&lt;/body>
+&lt;/html>
